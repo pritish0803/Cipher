@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+#define modulo(a,b) ( (((a)%(b))+(b)) % (b))
 using namespace std;
 
 struct point{
@@ -26,11 +27,12 @@ class Encription{
 };
 void ellipticCurve_points(int,int,int,Encription &);
 void display(Encription &);
-bool isPerfectSquare(int);
 Encription generateCipher(int, int, Encription &);
 struct point pointMultipication(int, int, int, int, int, int);
-int modulo(int, int);
 int inverseModulo(int,int);
+int gcd(int a, int b);
+int power(int x, unsigned int y, unsigned int m);
+
 
 void Encription::append_X(int data){
 	X.push_back(data);
@@ -66,50 +68,58 @@ int main(){
 	return 0;
 }
 
-bool isPerfectSquare(int number){
-	double val= sqrt(number);
-	if((val - floor(val)) == 0)
-		return true;
-	return false;
-}
-
-//modulus function
-int modulo(int x,int N){
-	cout<<x<<" modulus "<<N<<" is :";
-	int R=(x % N + N) %N;
-	cout<<R<<endl;
-    return R;
-}
-
-int inverseModulo(int number, int divisor)
-{	
-	cout<<number<<" inverseModulo "<<divisor<<" is: ";
-	int x=modulo(pow(number,(divisor-2)),divisor);
-	cout<<x<<endl;
+int inverseModulo(int a, int m)
+{
+	while(a<0){
+		a=a+m;
+	}
+	int x,g = gcd(a, m);
+	if (g != 1)
+		cout << "Inverse doesn't exist of : "<<a<<endl;
+	else
+	{
+		x=power(a, m-2, m);
+		cout << "Modular multiplicative inverse of: "<<a<<" is "
+			<< x<<endl;
+	}
 	return x;
 }
 
+// To compute x^y under modulo m
+int power(int x, unsigned int y, unsigned int m)
+{
+	if (y == 0)
+		return 1;
+	int p = modulo(power(x, y/2, m),m);
+	p = modulo((p * p),m);
+
+	return (modulo(y,2) == 0)? p : modulo((x * p),m);
+}
+
+// Function to return gcd of a and b
+int gcd(int a, int b)
+{
+	if (a == 0)
+		return b;
+	return gcd(modulo(b,a), a);
+}
+
+
+
 void ellipticCurve_points(int p,int a,int b,Encription &obj){
-	long int expr,w; //(Y*Y)
-	int x=0;
-	while(x<p){
-		expr=(pow(x,3) + (a * x) + b);
-		w= modulo(expr,p);
-		if(isPerfectSquare(w)){
-			if(int(sqrt(w))==0){
-				obj.append_X(x);
-				obj.append_Y(int(sqrt(w)));
-			}
-			else{
-				obj.append_X(x);
-				obj.append_Y(int(sqrt(w)));
-				obj.append_X(x);
-				obj.append_Y(p - int(sqrt(w)));
+		int expr1,expr2;
+		for(int y=0;y<13;y++){
+			expr1=pow(y,2);
+			expr1=expr1 % 13;
+			for(int x=0;x<13;x++){
+				expr2=pow(x,3)+(a*x)+(b);
+				expr2=modulo(expr2,p);
+				if(expr2==expr1)
+					obj.append_X(x);
+					obj.append_Y(y);
 			}
 		}
-		x=x+1;
 	}
-}
 
 void display(Encription &obj){
 	for(int i=0;i<obj.size_X();i++){
@@ -143,9 +153,9 @@ Encription generateCipher(int p, int a, Encription &obj){
 
 	//testing******************************************
 	//delete these later********************************
-	e1.xx=2;
-	e1.yy=22;
-	d=4;
+	//e1.xx=2;
+	//e1.yy=22;
+	//d=4;
 	
 
 	//calculate e2=d*e1
