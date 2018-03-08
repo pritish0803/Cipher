@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+#include <cmath>
 #define modulo(a,b) ( (((a)%(b))+(b)) % (b))
 using namespace std;
 
@@ -78,7 +79,8 @@ int inverseModulo(int a, int m)
 		cout << "Inverse doesn't exist of : "<<a<<endl;
 	else
 	{
-		x=power(a, m-2, m);
+		x=power(a, m-2,m);
+		x=modulo(x,m);
 		cout << "Modular multiplicative inverse of: "<<a<<" is "
 			<< x<<endl;
 	}
@@ -108,10 +110,10 @@ int gcd(int a, int b)
 
 void ellipticCurve_points(int p,int a,int b,Encription &obj){
 		int expr1,expr2;
-		for(int y=0;y<13;y++){
+		for(int y=0;y<p;y++){
 			expr1=pow(y,2);
-			expr1=expr1 % 13;
-			for(int x=0;x<13;x++){
+			expr1=expr1 % p;
+			for(int x=0;x<p;x++){
 				expr2=pow(x,3)+(a*x)+(b);
 				expr2=modulo(expr2,p);
 				if(expr2==expr1)
@@ -156,7 +158,7 @@ Encription generateCipher(int p, int a, Encription &obj){
 	//e1.xx=2;
 	//e1.yy=22;
 	//d=4;
-	
+
 
 	//calculate e2=d*e1
 	e2.xx=e1.xx;
@@ -196,7 +198,7 @@ Encription generateCipher(int p, int a, Encription &obj){
  struct point pointMultipication(int x2, int x1, int y2, int y1,int p, int a){
  	struct point temp1={0,0};
  	long long int expr1,expr2,expr,lambda;
- 	if(x1==x2){
+ 	if(x1==x2 && y1==y2){
  		expr1=(3*pow(x1,2)+ a);
  		expr1=modulo(expr1,p);
  		expr2=inverseModulo((2*y1),p);
@@ -210,12 +212,9 @@ Encription generateCipher(int p, int a, Encription &obj){
  	lambda=modulo(expr,p);
  	temp1.xx=pow(lambda,2)-x1-x2;
  	temp1.yy=lambda*(x1-temp1.xx) - y1;
+	temp1.xx=modulo(temp1.xx,p);
+	temp1.yy=modulo(temp1.yy,p);
  	cout<<"lambda: "<<lambda<<endl;
  	cout<<"xx :"<<temp1.xx<<" yy:"<<temp1.yy<<endl;
 	return temp1;
 }
-
-
-
-
-
