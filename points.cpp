@@ -5,6 +5,8 @@
 #define modulo(a,b) ( (((a)%(b))+(b)) % (b))
 using namespace std;
 
+int d;
+
 struct point{
 	int xx;
 	int yy;
@@ -33,7 +35,7 @@ struct point pointMultipication(int, int, int, int, int, int);
 int inverseModulo(int,int);
 int gcd(int a, int b);
 int power(int x, unsigned int y, unsigned int m);
-
+void decription(Encription & , int , int);
 
 void Encription::append_X(int data){
 	X.push_back(data);
@@ -53,19 +55,20 @@ int Encription::size_X(){
 int Encription::size_Y(){
 	return Y.size();
 }
-
 int main(){
 	Encription obj;
 	int p,a,b;
 	cout<<"Elliptical curve: Y*Y=(X*X*X) + a*X + b"<<endl;
-	cout<<"enter P a b:"<<endl;
+	cout<<"enter p a b:"<<endl;
 	cin>>p>>a>>b;
 	ellipticCurve_points(p,a,b,obj);
-	//display(obj);
+	display(obj);
 	Encription cipher;
 	cipher=generateCipher(p,a,obj);
 	for(int i=0;i<cipher.size_X();i++)
-		cout<<"Ciper Point :"<<cipher.get_X(i)<<" "<<cipher.get_Y(i)<<endl;
+		cout<<"Ciper Point "<<(i+1)<<" :"<<cipher.get_X(i)<<" "<<cipher.get_Y(i)<<endl;
+	decription(cipher,p,a);
+	cout<<"\n"<<d;
 	return 0;
 }
 
@@ -117,8 +120,8 @@ void ellipticCurve_points(int p,int a,int b,Encription &obj){
 				expr2=pow(x,3)+(a*x)+(b);
 				expr2=modulo(expr2,p);
 				if(expr2==expr1)
-					obj.append_X(x);
-					obj.append_Y(y);
+					{obj.append_X(x);
+					obj.append_Y(y);}
 			}
 		}
 	}
@@ -149,7 +152,7 @@ Encription generateCipher(int p, int a, Encription &obj){
 	}
 
 	//choose a random "d"
-	int d = (rand() % p) + 1;
+	d = (rand() % p) + 1;
 
 
 
@@ -197,6 +200,7 @@ Encription generateCipher(int p, int a, Encription &obj){
 
  struct point pointMultipication(int x2, int x1, int y2, int y1,int p, int a){
  	struct point temp1={0,0};
+ 	cout<<"x1:"<<x1<<"  y1:"<<y1<<endl;
  	long long int expr1,expr2,expr,lambda;
  	if(x1==x2 && y1==y2){
  		expr1=(3*pow(x1,2)+ a);
@@ -217,4 +221,35 @@ Encription generateCipher(int p, int a, Encription &obj){
  	cout<<"lambda: "<<lambda<<endl;
  	cout<<"xx :"<<temp1.xx<<" yy:"<<temp1.yy<<endl;
 	return temp1;
+}
+
+void decription(Encription &obj, int p, int a){
+	struct point c1={0,0};
+	struct point c2={0,0};
+	struct point e1={0,0};
+	struct point e2={0,0};
+	struct point q={0,0};
+	c1.xx= obj.get_X(0);
+	c1.yy= obj.get_Y(0);
+	c2.xx= obj.get_X(1);
+	c2.yy= obj.get_Y(1);
+	cout<<c1.xx<<c1.yy<<c2.xx<<c2.yy;
+	e1.xx=c1.xx;
+	e1.yy=c1.yy;
+	e2.xx=e1.xx;
+	e2.yy=e1.yy;
+	for(int i=0;i<d;i++)
+		e2=pointMultipication(e2.xx,e1.xx,e2.yy,e1.yy,p,a);
+	/*e2.xx=inverseModulo(q.xx,p);
+	e2.yy=inverseModulo(q.yy,p);
+	e2.xx=modulo(q.xx,p);
+	e2.yy=modulo(q.yy,p);*/
+	e2.xx=modulo(e2.xx,p);
+	e2.yy=(p-e2.yy);
+
+	q=pointMultipication(c2.xx,e2.xx,c2.yy,e2.yy,p,a);
+
+
+
+
 }
