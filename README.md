@@ -11,5 +11,5 @@
 
 4.[wrls-aodv.tcl](wrls-aodv.tcl) : Tcl script to simulate the 3 Node (Sender, Receiver, Loss of Packets) for packets transfering ns2 and displaying the packet path with time in xgraph.<br>
 5.[ECC_CIPHER.sh](ECC_CIPHER.SH) : Shell script to run all of the above programs.<br><br><hr>
-[Abstract of the above implementation](DCCN.pptx)
+[Abstract of the above implementation](DCCN.pdf)
 
